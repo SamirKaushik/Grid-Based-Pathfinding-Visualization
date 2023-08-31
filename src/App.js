@@ -254,7 +254,9 @@ function App() {
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4" >
           <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
             <div>Grid Size: {n}</div>
-            <input type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+            <input 
+            disabled={processing}
+            type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
           </div>
           <button
             onClick={() => {
@@ -308,7 +310,9 @@ function App() {
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4">
           <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
             <div>Speed: {speed}</div>
-            <input type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+            <input 
+            disabled={processing}
+            type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
           </div>
           <button onClick={async () => {
             setProcessing(1)

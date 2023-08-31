@@ -44,11 +44,20 @@ function App() {
   const [processing, setProcessing] = useState(false);
   const cancelToken = useRef(false);
   const [speed, setSpeed] = useState(8)
+  const [cellSizeRef,setCellSizeRef]=useState("vw")
   // const [coords, setCoords] = useState({
   //   start: { x: 0, y: 0 },
   //   end: { x: n - 1, y: n - 1 }
   // })
 
+  useEffect(()=>{
+    if(window.innerWidth<800){
+      setCellSizeRef("vh")
+    }
+    else{
+      setCellSizeRef("vw")
+    }
+  },[window.innerWidth])
   const clearPath = async () => {
     var oldgrid = [...grid];
     let rows = n;
@@ -250,9 +259,9 @@ function App() {
   return (
     <div className="w-[100vw] h-[100vh] flex items-center justify-center overflow-hidden">
       <ToastContainer />
-      <div className="flex items-center w-full px-[50px] gap-[50px]">
-        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4" >
-          <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
+      <div className="flex md:flex-row flex-col items-center w-full md:px-[50px] md:gap-[50px] gap-[15px] p-[20px]">
+        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
+          <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
             <div>Grid Size: {n}</div>
             <input 
             disabled={processing}
@@ -268,7 +277,7 @@ function App() {
                 toast.info("Choose Valid size (10-200) ")
               }
             }}
-            className={`rounded-md border px-[10px] py-[5px] text-sm`}
+            className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
             disabled={processing}
           >Generate
           </button>
@@ -283,14 +292,14 @@ function App() {
                     return <div
                       style={
                         {
-                          height: cellSize + "vw",
-                          width: cellSize + "vw",
-                          margin: cellSize / 10 + "vw"
+                          height: cellSize + cellSizeRef,
+                          width: cellSize + cellSizeRef,
+                          margin: cellSize / 10 + cellSizeRef
                         }
                       }
                       key={`r${idx}c${i}`}
                       id={`r${idx}c${i}`}
-                      className={`h-[0.2vw] w-[0.2vw] m-[0.1vw] 
+                      className={` 
                     ${idx === 0 && i === 0 ? "bg-blue-500" :
                           idx === n - 1 && i === n - 1 ? "bg-red-500" :
                             cell === 0 ? "bg-gray-200" :
@@ -307,8 +316,8 @@ function App() {
             }
           </div>
         </div>
-        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4">
-          <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
+        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
+          <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px]`}>
             <div>Speed: {speed}</div>
             <input 
             disabled={processing}
@@ -316,20 +325,21 @@ function App() {
           </div>
           <button onClick={async () => {
             setProcessing(1)
-          }} className="rounded-md border px-[10px] py-[5px] text-sm"
+          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
             disabled={processing}
-
+            title="Traverses all possible paths"
           >Backtracking</button>
           <button onClick={async () => {
             setProcessing(2)
-          }} className="rounded-md border px-[10px] py-[5px] text-sm"
+          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
             disabled={processing}
-
+            title="Won't enter a blocked path again because of memoization"
           >Memoized Backtracking</button>
           <button onClick={async () => {
             setProcessing(3)
-          }} className="rounded-md border px-[10px] py-[5px] text-sm"
+          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
             disabled={processing}
+            title="Visually shows BFS with a flood-filling like effect"
           >Breadth First Search</button>
         </div>
       </div>

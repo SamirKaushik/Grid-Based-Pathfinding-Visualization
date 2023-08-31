@@ -42,7 +42,8 @@ function App() {
   const [n, setN] = useState(50);
   const [cellSize, setCellSize] = useState(30 / n);
   const [processing, setProcessing] = useState(false);
-  const cancelToken = useRef(false); // Create a ref for the cancel token.
+  const cancelToken = useRef(false);
+  const [speed, setSpeed] = useState(8)
   // const [coords, setCoords] = useState({
   //   start: { x: 0, y: 0 },
   //   end: { x: n - 1, y: n - 1 }
@@ -101,7 +102,7 @@ function App() {
     const originalVal = grid[row][col];
     grid[row][col] = 2;
     setGrid([...grid]);
-    await delay(0);
+    await delay((10 - speed) * 50);
 
     if (row === n - 1 && col === n - 1) {
       setGrid([...grid]);
@@ -115,7 +116,7 @@ function App() {
 
     grid[row][col] = originalVal;
     setGrid([...grid]);
-    await delay(0);
+    await delay((10 - speed) * 50);
 
     return false;
   }
@@ -129,7 +130,7 @@ function App() {
     const originalVal = grid[row][col];
     grid[row][col] = 2;
     setGrid([...grid]);
-    await delay(0);
+    await delay((10 - speed) * 50);
 
     if (row === n - 1 && col === n - 1) {
       setGrid([...grid]);
@@ -145,7 +146,7 @@ function App() {
     dp[row][col] = false;
     //path not available after {row,col}, so we memoize this
     setGrid([...grid]);
-    await delay(0);
+    await delay((10 - speed) * 50);
 
     return false;
   }
@@ -170,7 +171,7 @@ function App() {
 
           // Update the grid and trigger a UI update
           setGrid([...grid]);
-          await delay(0);
+          await delay((10 - speed) * 50);
 
           return true;
         }
@@ -201,7 +202,7 @@ function App() {
       }
       // Update the grid and trigger a UI update after marking the cell as visited
       setGrid([...grid]);
-      await delay(0);
+      await delay((10 - speed) * 50);
     }
 
     return false;
@@ -247,11 +248,14 @@ function App() {
   }, [processing])
 
   return (
-    <div className="w-[100vw] h-[100vh] flex items-center justify-center">
+    <div className="w-[100vw] h-[100vh] flex items-center justify-center overflow-hidden">
       <ToastContainer />
-      <div className="flex items-center gap-[20px]">
-        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition" >
-          <div className={`rounded-md border px-[10px] text-sm py-[5px] flex gap-[5px] justify-center items-center`}><div>Grid Size: </div><input type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="w-[50px] outline-none" name="Size" id="" /></div>
+      <div className="flex items-center w-full px-[50px] gap-[50px]">
+        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4" >
+          <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
+            <div>Grid Size: {n}</div>
+            <input type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+          </div>
           <button
             onClick={() => {
               if (n >= 1) {
@@ -267,7 +271,7 @@ function App() {
           >Generate
           </button>
         </div>
-        <div>
+        <div className="min-w-fit transition">
           <button style={!processing ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; }} className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
           <div id="grid" className="rounded-lg p-[15px] shadow-lg transition">
             {
@@ -301,7 +305,11 @@ function App() {
             }
           </div>
         </div>
-        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition">
+        <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow max-w-1/4">
+          <div className={`rounded-md border px-[10px] text-sm py-[5px] w-full`}>
+            <div>Speed: {speed}</div>
+            <input type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+          </div>
           <button onClick={async () => {
             setProcessing(1)
           }} className="rounded-md border px-[10px] py-[5px] text-sm"

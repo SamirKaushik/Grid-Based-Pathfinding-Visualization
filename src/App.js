@@ -44,20 +44,20 @@ function App() {
   const [processing, setProcessing] = useState(false);
   const cancelToken = useRef(false);
   const [speed, setSpeed] = useState(8)
-  const [cellSizeRef,setCellSizeRef]=useState("vw")
+  const [cellSizeRef, setCellSizeRef] = useState("vw")
   // const [coords, setCoords] = useState({
   //   start: { x: 0, y: 0 },
   //   end: { x: n - 1, y: n - 1 }
   // })
 
-  useEffect(()=>{
-    if(window.innerWidth<800){
+  useEffect(() => {
+    if (window.innerWidth < 800) {
       setCellSizeRef("vh")
     }
-    else{
+    else {
       setCellSizeRef("vw")
     }
-  },[window.innerWidth])
+  }, [window.innerWidth])
   const clearPath = async () => {
     var oldgrid = [...grid];
     let rows = n;
@@ -125,7 +125,8 @@ function App() {
 
     grid[row][col] = originalVal;
     setGrid([...grid]);
-    await delay((10 - speed) * 50);
+    if (!cancelToken.current)
+      await delay((10 - speed) * 50);
 
     return false;
   }
@@ -155,7 +156,8 @@ function App() {
     dp[row][col] = false;
     //path not available after {row,col}, so we memoize this
     setGrid([...grid]);
-    await delay((10 - speed) * 50);
+    if (!cancelToken.current)
+      await delay((10 - speed) * 50);
 
     return false;
   }
@@ -168,9 +170,15 @@ function App() {
 
     while (!q.empty()) {
       let size = q.size;
-      if (cancelToken.current) return false;
+      if (cancelToken.current) {
+        clearPath();
+        return false;
+      }
       while (size--) {
-        if (cancelToken.current) return false;
+        if (cancelToken.current) {
+          clearPath();
+          return false;
+        }
         const node = q.front();
         const { row, col } = node;
         grid[row][col] = 2;
@@ -223,16 +231,19 @@ function App() {
     cancelToken.current = false; // Reset the cancel token.
     switch (type) {
       case 1:
-        if ((await findPathSlow([...grid], 0, 0))) toast.success("Path Found!!!");
-        else toast.error("No Path Found!!!");
+        if ((await findPathSlow([...grid], 0, 0))) toast.success("Path Found");
+        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        else toast.error("No Path Found");
         break;
       case 2:
-        if ((await findPathMemo([...grid], 0, 0, dpGrid()))) toast.success("Path Found!!!");
-        else toast.error("No Path Found!!!");
+        if ((await findPathMemo([...grid], 0, 0, dpGrid()))) toast.success("Path Found");
+        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        else toast.error("No Path Found");
         break;
       case 3:
-        if ((await bfs([...grid]))) toast.success("Destination Reached!!!");
-        else toast.error("No Path Found!!!");
+        if ((await bfs([...grid]))) toast.success("Destination Reached");
+        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        else toast.error("No Path Found");
         break;
       default: break;
     }
@@ -263,9 +274,9 @@ function App() {
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
           <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
             <div>Grid Size: {n}</div>
-            <input 
-            disabled={processing}
-            type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+            <input
+              disabled={processing}
+              type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
           </div>
           <button
             onClick={() => {
@@ -319,9 +330,9 @@ function App() {
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
           <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px]`}>
             <div>Speed: {speed}</div>
-            <input 
-            disabled={processing}
-            type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+            <input
+              disabled={processing}
+              type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
           </div>
           <button onClick={async () => {
             setProcessing(1)

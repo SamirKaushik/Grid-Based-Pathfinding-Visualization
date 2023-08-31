@@ -251,7 +251,7 @@ function App() {
       <ToastContainer />
       <div className="flex items-center gap-[20px]">
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition" >
-          <div className={`rounded-md border px-[10px] text-sm py-[5px] flex gap-[5px] justify-center items-center`}><div>Grid Size: </div><input type="number" value={n} onChange={(e) => { setN(e.target.value) }} className="w-[50px] outline-none" name="Size" id="" /></div>
+          <div className={`rounded-md border px-[10px] text-sm py-[5px] flex gap-[5px] justify-center items-center`}><div>Grid Size: </div><input type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="w-[50px] outline-none" name="Size" id="" /></div>
           <button
             onClick={() => {
               if (n >= 1) {
@@ -285,11 +285,12 @@ function App() {
                       key={`r${idx}c${i}`}
                       id={`r${idx}c${i}`}
                       className={`h-[0.2vw] w-[0.2vw] m-[0.1vw] 
-                    ${idx === 0 && i === 0 && "bg-blue-500"} 
-                    ${idx === n - 1 && i === n - 1 && "bg-red-500"} 
-                    ${cell === 0 && "bg-gray-200"} 
-                    ${cell === 1 && "bg-white"} 
-                    ${cell === 2 && "bg-black"}
+                    ${idx === 0 && i === 0 ? "bg-blue-500" :
+                          idx === n - 1 && i === n - 1 ? "bg-red-500" :
+                            cell === 0 ? "bg-gray-200" :
+                              cell === 1 ? "bg-white" :
+                                cell === 2 && "bg-black"
+                        }
                      overflow-visible
                      `}
                     >

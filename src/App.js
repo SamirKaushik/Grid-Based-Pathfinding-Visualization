@@ -267,10 +267,10 @@ function App() {
       selectAlgorithm(processing)
     }
   }, [processing])
-
+  if(!grid) return <></>
   return (
     <div className="w-[100vw] h-[100vh] flex items-center justify-center overflow-hidden">
-      <ToastContainer />
+      <ToastContainer autoClose={3500} />
       <div className="flex md:flex-row flex-col items-center w-full md:px-[50px] md:gap-[50px] gap-[15px] p-[20px]">
         <div style={processing ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
           <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>

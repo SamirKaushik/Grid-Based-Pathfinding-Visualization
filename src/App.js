@@ -65,7 +65,7 @@ function App() {
     let cols = n;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (oldgrid[i][j] === 2) oldgrid[i][j] = 1;
+        if (oldgrid[i][j] === 2 || oldgrid[i][j] === 3) oldgrid[i][j] = 1;
       }
     }
     setGrid(oldgrid);
@@ -103,7 +103,7 @@ function App() {
     return row < 0 || col < 0 || row > (n - 1) || col > (n - 1) || grid[row][col] === 0 || grid[row][col] === 2;
   }
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const findPathSlow = async (grid, row, col) => {
+  const findPathSlow = async (grid, row, col, dist) => {
     if (cancelToken.current) { return false; }
     if (isBlocked(grid, row, col)) {
       return false;
@@ -116,13 +116,14 @@ function App() {
 
     if (row === n - 1 && col === n - 1) {
       setGrid([...grid]);
+      toast.success(`Reached the destination! Distance covered: ${dist} cells`)
       return true;
     }
 
-    if (await findPathSlow([...grid], row + 1, col)) return true;
-    if (await findPathSlow([...grid], row, col + 1)) return true;
-    if (await findPathSlow([...grid], row - 1, col)) return true;
-    if (await findPathSlow([...grid], row, col - 1)) return true;
+    if (await findPathSlow([...grid], row + 1, col, dist + 1)) return true;
+    if (await findPathSlow([...grid], row, col + 1, dist + 1)) return true;
+    if (await findPathSlow([...grid], row - 1, col, dist + 1)) return true;
+    if (await findPathSlow([...grid], row, col - 1, dist + 1)) return true;
 
     grid[row][col] = originalVal;
     setGrid([...grid]);
@@ -131,7 +132,7 @@ function App() {
 
     return false;
   }
-  const findPathMemo = async (grid, row, col, dp) => {
+  const findPathMemo = async (grid, row, col, dp, dist) => {
     if (cancelToken.current) return false;
     if (isBlocked(grid, row, col)) {
       return false;
@@ -145,13 +146,14 @@ function App() {
 
     if (row === n - 1 && col === n - 1) {
       setGrid([...grid]);
+      toast.success(`Reached the destination! Distance covered: ${dist} cells`)
       return true;
     }
 
-    if (await findPathMemo([...grid], row + 1, col, dp)) return true;
-    if (await findPathMemo([...grid], row, col + 1, dp)) return true;
-    if (await findPathMemo([...grid], row - 1, col, dp)) return true;
-    if (await findPathMemo([...grid], row, col - 1, dp)) return true;
+    if (await findPathMemo([...grid], row + 1, col, dp, dist + 1)) return true;
+    if (await findPathMemo([...grid], row, col + 1, dp, dist + 1)) return true;
+    if (await findPathMemo([...grid], row - 1, col, dp, dist + 1)) return true;
+    if (await findPathMemo([...grid], row, col - 1, dp, dist + 1)) return true;
 
     grid[row][col] = originalVal;
     dp[row][col] = false;
@@ -227,23 +229,109 @@ function App() {
 
   }
 
+  const traceShortestPath = async (path, grid, dist) => {
+    // console.log(grid, "entered func");
+    const dirx = [1, 0, -1, 0];
+    const diry = [0, 1, 0, -1];
+    let x = 0, y = 0;
+    for (let i = 0; i < path.length; i++) {
+      // console.log(grid,"inside loop");
+      grid[x][y] = 2;
+      x += dirx[path[i]];
+      y += diry[path[i]];
+      setGrid([...grid]);
+      await delay((10 - speed) * 50);
+    }
+    toast.success(`Reached the destination! Distance covered: ${dist} cells`)
+    return true;
+  }
+
+  const shortestPath = async (grid) => {
+    const q = new Queue();
+    q.push({ row: 0, col: 0, dist: 0, path: [] });
+
+    const visited = Array.from({ length: n }, () => Array(n).fill(false));
+
+    while (!q.empty()) {
+      let size = q.size;
+      if (cancelToken.current) {
+        clearPath();
+        return false;
+      }
+      while (size--) {
+        if (cancelToken.current) {
+          clearPath();
+          return false;
+        }
+        const node = q.front();
+        const { row, col, dist, path } = node;
+        grid[row][col] = 3;
+        if (row === n - 1 && col === n - 1) {
+          // Mark the destination cell as visited
+          visited[row][col] = true;
+
+          // Update the grid and trigger a UI update
+          setGrid([...grid]);
+          await delay((10 - speed) * 50);
+          console.log(path);
+          return await traceShortestPath(path, [...grid], dist);
+        }
+
+        visited[row][col] = true; // Mark the current node as visited
+
+        const dirx = [1, 0, -1, 0];
+        const diry = [0, 1, 0, -1];
+
+        for (let i = 0; i < 4; i++) {
+          const newRow = row + dirx[i];
+          const newCol = col + diry[i];
+
+          if (
+            newRow >= 0 &&
+            newRow < n &&
+            newCol >= 0 &&
+            newCol < n &&
+            grid[newRow][newCol] !== 0 &&
+            !visited[newRow][newCol]
+          ) {
+            q.push({ row: newRow, col: newCol, dist: dist + 1, path: [...path, i] });
+            visited[newRow][newCol] = true; // Mark the adjacent node as visited
+          }
+        }
+
+        q.pop();
+      }
+      // Update the grid and trigger a UI update after marking the cell as visited
+      setGrid([...grid]);
+      await delay((10 - speed) * 50);
+    }
+
+    return false;
+
+  }
+
   const selectAlgorithm = async (type) => {
     await clearPath()
     cancelToken.current = false; // Reset the cancel token.
     switch (type) {
       case 1:
-        if ((await findPathSlow([...grid], 0, 0))) toast.success("Path Found");
-        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        if ((await findPathSlow([...grid], 0, 0, 0))) { }
+        else if (cancelToken.current) toast.info("Algorithm stopped before completion")
         else toast.error("No Path Found");
         break;
       case 2:
-        if ((await findPathMemo([...grid], 0, 0, dpGrid()))) toast.success("Path Found");
-        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        if ((await findPathMemo([...grid], 0, 0, dpGrid(), 0))) { }
+        else if (cancelToken.current) toast.info("Algorithm stopped before completion")
         else toast.error("No Path Found");
         break;
       case 3:
         if ((await bfs([...grid]))) toast.success("Destination Reached");
-        else if(cancelToken.current) toast.info("Algorithm stopped before completion")
+        else if (cancelToken.current) toast.info("Algorithm stopped before completion")
+        else toast.error("No Path Found");
+        break;
+      case 4:
+        if ((await shortestPath([...grid]))) { }
+        else if (cancelToken.current) toast.info("Algorithm stopped before completion")
         else toast.error("No Path Found");
         break;
       default: break;
@@ -267,7 +355,7 @@ function App() {
       selectAlgorithm(processing)
     }
   }, [processing])
-  if(!grid) return <></>
+  if (!grid) return <></>
   return (
     <div className="w-[100vw] h-[100vh] flex items-center justify-center overflow-hidden">
       <ToastContainer autoClose={3500} />
@@ -316,7 +404,8 @@ function App() {
                           idx === n - 1 && i === n - 1 ? "bg-red-500" :
                             cell === 0 ? "bg-gray-200" :
                               cell === 1 ? "bg-white" :
-                                cell === 2 && "bg-black"
+                                cell === 2 ? "bg-black" :
+                                  cell === 3 && "bg-green-300"
                         }
                      overflow-visible
                      `}
@@ -353,6 +442,12 @@ function App() {
             disabled={processing}
             title="Visually shows BFS with a flood-filling like effect"
           >Breadth First Search</button>
+          <button onClick={async () => {
+            setProcessing(4)
+          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+            disabled={processing}
+            title="Using BFS, we find out the shortest path"
+          >Shortest Path</button>
         </div>
       </div>
     </div>

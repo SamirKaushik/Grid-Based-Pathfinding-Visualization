@@ -467,9 +467,9 @@ function App() {
       <ToastContainer autoClose={3500} />
       <div className="flex md:flex-row flex-col items-center w-full md:px-[50px] md:gap-[50px] gap-[15px] p-[20px]">
         {mobileView ?
-          <div className="max-w-fit mx-auto">
-            <div onClick={() => { setPopup(1) }} className="flex items-center text-xs gap-[5px] rounded-md shadow-md px-[10px] mb-[5px] py-[5px]"><AiOutlineControl /> Grid Controls</div>
-            <div onClick={() => { setPopup(2) }} className="flex items-center text-xs gap-[5px] rounded-md shadow-md px-[10px] py-[5px]"><AiOutlineControl /> Algorithm and Speed Controls</div>
+          <div className="max-w-fit text-sm md:text-base mx-auto">
+            <div onClick={() => { setPopup(1) }} className="flex items-center gap-[5px] rounded-md shadow-md px-[10px] mb-[5px] py-[5px]"><AiOutlineControl /> Grid Controls</div>
+            <div onClick={() => { setPopup(2) }} className="flex items-center gap-[5px] rounded-md shadow-md px-[10px] py-[5px]"><AiOutlineControl /> Algorithm and Speed Controls</div>
           </div>
           : GridControls()}
         <div className="min-w-fit transition">

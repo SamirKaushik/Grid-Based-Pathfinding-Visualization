@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaCross, FaEye, FaList, FaStop } from "react-icons/fa";
-import { AiFillCloseCircle, AiFillControl, AiOutlineClear, AiOutlineControl } from "react-icons/ai"
+import { FaStop } from "react-icons/fa";
+import { AiFillCloseCircle, AiOutlineClear, AiOutlineControl } from "react-icons/ai"
 class Queue {
   constructor() {
     this.items = {};

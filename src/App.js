@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaStop } from "react-icons/fa";
 import { AiFillCloseCircle, AiOutlineClear, AiOutlineControl } from "react-icons/ai"
+import svg from "./images/location-path.svg"
 class Queue {
   constructor() {
     this.items = {};
@@ -573,6 +574,9 @@ useEffect(()=>{
             }
           </div>
         </div>
+      </div>}
+      {mobileView&&<div className="overflow-hidden w-[80%] mx-auto fixed bottom-[20px] z-0">
+        <img src={svg} alt="" />
       </div>}
     </div>
   );

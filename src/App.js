@@ -515,7 +515,7 @@ useEffect(()=>{
                         }
                       }
                       onMouseEnter={() => {
-                        if (mazeCreation&&cellSelection) {
+                        if (mazeCreation&&(cellSelection||mobileView)) {
                           let oldGrid = grid;
                           oldGrid[idx][i] = 0;
                           if(idx === 0 && i === 0) oldGrid[idx][i] = 1;

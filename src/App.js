@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaStop } from "react-icons/fa";
-import { AiOutlineClear } from "react-icons/ai"
+import { FaCross, FaEye, FaList, FaStop } from "react-icons/fa";
+import { AiFillCloseCircle, AiFillControl, AiOutlineClear, AiOutlineControl } from "react-icons/ai"
 class Queue {
   constructor() {
     this.items = {};
@@ -49,12 +49,18 @@ function App() {
   const [cellSizeRef, setCellSizeRef] = useState("vw")
   const [gridSpacing, setgridSpacing] = useState(1);
   const [mazeCreation, setMazeCreation] = useState(false)
+  const [mobileView, setMobileView] = useState(false);
+  const [popup, setPopup] = useState(null)
   // const [coords, setCoords] = useState({
   //   start: { x: 0, y: 0 },
   //   end: { x: n - 1, y: n - 1 }
   // })
 
   useEffect(() => {
+    if (window.innerWidth < 600) {
+      setMobileView(true)
+    }
+    else setMobileView(false)
     if (window.innerWidth < 800) {
       setCellSizeRef("vh")
     }
@@ -329,6 +335,7 @@ function App() {
   }
 
   const selectAlgorithm = async (type) => {
+    setPopup(null)
     await clearPath()
     cancelToken.current = false; // Reset the cancel token.
     switch (type) {
@@ -357,6 +364,87 @@ function App() {
     setProcessing(false)
   }
 
+  const GridControls = () => {
+    return <div style={processing || mazeCreation ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
+      <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
+        <div>Grid Size: {n}</div>
+        <input
+          disabled={processing || mazeCreation}
+          type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+      </div>
+      <div className="rounded-md shadow-md border p-[10px] flex flex-col gap-[10px]">
+        <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
+          <div>Grid Spacing: {gridSpacing}</div>
+          <input
+            disabled={processing || mazeCreation}
+            type="range" min={1} max={10} step={1} value={gridSpacing} onChange={(e) => { setgridSpacing(e.target.value) }} className="outline-none w-full" name="Density" id="" />
+        </div>
+        <button
+          onClick={() => {
+            generateGrid()
+            setCellSize(30 / n)
+            setPopup(null)
+          }}
+          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
+          disabled={processing || mazeCreation}
+        >Auto-Generate
+        </button>
+
+        <div className="text-center">
+          OR
+        </div>
+        <button
+          onClick={() => {
+            clearGrid()
+            setCellSize(30 / n)
+            setMazeCreation(true)
+            setPopup(null)
+          }}
+          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
+          disabled={processing || mazeCreation}
+        >Draw Maze Manually
+        </button>
+      </div>
+    </div>
+  }
+
+  const AlgoAndSpeedControls = () => {
+    return <div style={processing || mazeCreation ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
+      <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px]`}>
+        <div>Speed: {speed}</div>
+        <input
+          disabled={processing || mazeCreation}
+          type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+      </div>
+      <div className="flex flex-col gap-[10px] shadow-md border rounded-md p-[10px]">
+        <button onClick={async () => {
+          setProcessing(1)
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+          disabled={processing || mazeCreation}
+          title="Traverses all possible paths"
+        >Backtracking</button>
+        <button onClick={async () => {
+          setProcessing(2)
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+          disabled={processing || mazeCreation}
+          title="Won't enter a blocked path again because of memoization"
+        >Memoized Backtracking</button>
+        <button onClick={async () => {
+          setProcessing(3)
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+          disabled={processing || mazeCreation}
+          title="Visually shows BFS with a flood-filling like effect"
+        >Breadth First Search</button>
+        <button onClick={async () => {
+          setProcessing(4)
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+          disabled={processing || mazeCreation}
+          title="Using BFS, we find out the shortest path"
+        >Shortest Path</button>
+      </div>
+    </div>
+  }
+
   useEffect(() => {
     generateGrid()
     setCellSize(30 / n)
@@ -375,48 +463,15 @@ function App() {
   }, [processing])
   if (!grid) return <></>
   return (
-    <div className="w-[100vw] h-[100vh] flex items-center justify-center overflow-hidden">
+    <div className="w-[100vw] h-[100vh] flex md:items-center justify-center overflow-x-hidden">
       <ToastContainer autoClose={3500} />
       <div className="flex md:flex-row flex-col items-center w-full md:px-[50px] md:gap-[50px] gap-[15px] p-[20px]">
-        <div style={processing || mazeCreation ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
-          <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
-            <div>Grid Size: {n}</div>
-            <input
-              disabled={processing || mazeCreation}
-              type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
+        {mobileView ?
+          <div className="max-w-fit mx-auto">
+            <div onClick={() => { setPopup(1) }} className="flex items-center text-xs gap-[5px] rounded-md shadow-md px-[10px] mb-[5px] py-[5px]"><AiOutlineControl /> Grid Controls</div>
+            <div onClick={() => { setPopup(2) }} className="flex items-center text-xs gap-[5px] rounded-md shadow-md px-[10px] py-[5px]"><AiOutlineControl /> Algorithm and Speed Controls</div>
           </div>
-          <div className="rounded-md shadow-md border p-[10px] flex flex-col gap-[10px]">
-            <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
-              <div>Grid Spacing: {gridSpacing}</div>
-              <input
-                disabled={processing || mazeCreation}
-                type="range" min={1} max={10} step={1} value={gridSpacing} onChange={(e) => { setgridSpacing(e.target.value) }} className="outline-none w-full" name="Density" id="" />
-            </div>
-            <button
-              onClick={() => {
-                generateGrid()
-                setCellSize(30 / n)
-              }}
-              className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
-              disabled={processing || mazeCreation}
-            >Auto-Generate
-            </button>
-
-            <div className="text-center">
-              OR
-            </div>
-            <button
-              onClick={() => {
-                clearGrid()
-                setCellSize(30 / n)
-                setMazeCreation(true)
-              }}
-              className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
-              disabled={processing || mazeCreation}
-            >Draw Maze Manually
-            </button>
-          </div>
-        </div>
+          : GridControls()}
         <div className="min-w-fit transition">
           <div className="flex items-center gap-[5px]">
             <button style={!(processing || mazeCreation) ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; setMazeCreation(false) }} className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
@@ -472,41 +527,27 @@ function App() {
             }
           </div>
         </div>
-        <div style={processing || mazeCreation ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
-          <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px]`}>
-            <div>Speed: {speed}</div>
-            <input
-              disabled={processing || mazeCreation}
-              type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
-          </div>
-          <div className="flex flex-col gap-[10px] shadow-md border rounded-md p-[10px]">
-            <button onClick={async () => {
-              setProcessing(1)
-            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-              disabled={processing || mazeCreation}
-              title="Traverses all possible paths"
-            >Backtracking</button>
-            <button onClick={async () => {
-              setProcessing(2)
-            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-              disabled={processing || mazeCreation}
-              title="Won't enter a blocked path again because of memoization"
-            >Memoized Backtracking</button>
-            <button onClick={async () => {
-              setProcessing(3)
-            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-              disabled={processing || mazeCreation}
-              title="Visually shows BFS with a flood-filling like effect"
-            >Breadth First Search</button>
-            <button onClick={async () => {
-              setProcessing(4)
-            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-              disabled={processing || mazeCreation}
-              title="Using BFS, we find out the shortest path"
-            >Shortest Path</button>
+        {mobileView ? "" : AlgoAndSpeedControls()}
+      </div>
+      {popup && <div className="bg-[rgba(0,0,0,0.5)] flex justify-center items-center fixed bottom-0 z-20 w-full h-full">
+        <div className="flex flex-col w-[85%] items-end gap-[10px] justify-center popup">
+          <div className="text-white"><AiFillCloseCircle onClick={() => {
+            setPopup(null)
+          }} /></div>
+          <div className="bg-white w-full rounded-md">
+            {
+              popup === 1
+              &&
+              GridControls()
+            }
+            {
+              popup === 2
+              &&
+              AlgoAndSpeedControls()
+            }
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

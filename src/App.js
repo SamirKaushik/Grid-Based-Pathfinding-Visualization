@@ -49,6 +49,7 @@ function App() {
   const [cellSizeRef, setCellSizeRef] = useState("vw")
   const [gridSpacing, setgridSpacing] = useState(1);
   const [mazeCreation, setMazeCreation] = useState(false)
+  const [cellSelection,setCellSelection]=useState(false)
   const [mobileView, setMobileView] = useState(false);
   const [popup, setPopup] = useState(null)
   // const [coords, setCoords] = useState({
@@ -461,6 +462,20 @@ function App() {
       selectAlgorithm(processing)
     }
   }, [processing])
+
+useEffect(()=>{
+  window.addEventListener("mousedown",()=>{setCellSelection(true)})
+  window.addEventListener("mouseup",()=>{setCellSelection(false)})
+  window.addEventListener("touchstart",()=>{setCellSelection(true)})
+  window.addEventListener("touchend",()=>{setCellSelection(false)})
+  return ()=>{
+    window.removeEventListener("mousedown",()=>{setCellSelection(true)})
+    window.removeEventListener("mouseup",()=>{setCellSelection(false)})
+    window.removeEventListener("touchstart",()=>{setCellSelection(true)})
+    window.removeEventListener("touchend",()=>{setCellSelection(false)})
+  }
+},[])
+
   if (!grid) return <></>
   return (
     <div className="w-[100vw] h-[100vh] flex md:items-center justify-center overflow-x-hidden">
@@ -500,7 +515,7 @@ function App() {
                         }
                       }
                       onMouseEnter={() => {
-                        if (mazeCreation) {
+                        if (mazeCreation&&cellSelection) {
                           let oldGrid = grid;
                           oldGrid[idx][i] = 0;
                           setGrid([...oldGrid])

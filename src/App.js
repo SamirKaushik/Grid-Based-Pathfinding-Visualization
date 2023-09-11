@@ -250,7 +250,10 @@ function App() {
     const diry = [0, 1, 0, -1];
     let x = 0, y = 0;
     for (let i = 0; i < path.length; i++) {
-      // console.log(grid,"inside loop");
+      if (cancelToken.current) {
+        clearPath();
+        return false;
+      }
       grid[x][y] = 2;
       x += dirx[path[i]];
       y += diry[path[i]];
@@ -477,30 +480,30 @@ function App() {
               type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
           </div>
           <div className="flex flex-col gap-[10px] shadow-md border rounded-md p-[10px]">
-          <button onClick={async () => {
-            setProcessing(1)
-          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-            disabled={processing || mazeCreation}
-            title="Traverses all possible paths"
-          >Backtracking</button>
-          <button onClick={async () => {
-            setProcessing(2)
-          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-            disabled={processing || mazeCreation}
-            title="Won't enter a blocked path again because of memoization"
-          >Memoized Backtracking</button>
-          <button onClick={async () => {
-            setProcessing(3)
-          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-            disabled={processing || mazeCreation}
-            title="Visually shows BFS with a flood-filling like effect"
-          >Breadth First Search</button>
-          <button onClick={async () => {
-            setProcessing(4)
-          }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
-            disabled={processing || mazeCreation}
-            title="Using BFS, we find out the shortest path"
-          >Shortest Path</button>
+            <button onClick={async () => {
+              setProcessing(1)
+            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+              disabled={processing || mazeCreation}
+              title="Traverses all possible paths"
+            >Backtracking</button>
+            <button onClick={async () => {
+              setProcessing(2)
+            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+              disabled={processing || mazeCreation}
+              title="Won't enter a blocked path again because of memoization"
+            >Memoized Backtracking</button>
+            <button onClick={async () => {
+              setProcessing(3)
+            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+              disabled={processing || mazeCreation}
+              title="Visually shows BFS with a flood-filling like effect"
+            >Breadth First Search</button>
+            <button onClick={async () => {
+              setProcessing(4)
+            }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+              disabled={processing || mazeCreation}
+              title="Using BFS, we find out the shortest path"
+            >Shortest Path</button>
           </div>
         </div>
       </div>

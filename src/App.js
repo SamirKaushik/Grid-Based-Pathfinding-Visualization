@@ -44,15 +44,20 @@ function App() {
   const [grid, setGrid] = useState(null);
   const [n, setN] = useState(50);
   const [cellSize, setCellSize] = useState(30 / n);
+  const [cellSizeRef, setCellSizeRef] = useState("vw")
+
   const [processing, setProcessing] = useState(false);
   const cancelToken = useRef(false);
+
   const [speed, setSpeed] = useState(8)
-  const [cellSizeRef, setCellSizeRef] = useState("vw")
   const [gridSpacing, setgridSpacing] = useState(1);
+
   const [mazeCreation, setMazeCreation] = useState(false)
   const [cellSelection,setCellSelection]=useState(false)
+
   const [mobileView, setMobileView] = useState(false);
   const [popup, setPopup] = useState(null)
+
   const [coords, setCoords] = useState({
     start: { x: 0, y: 0 },
     end: { x: n - 1, y: n - 1 },
@@ -453,7 +458,6 @@ function App() {
     generateGrid()
     setCellSize(30 / n)
     return () => {
-      // Cleanup function to cancel ongoing operations when the component unmounts.
       cancelToken.current = true;
     };
   },
@@ -481,7 +485,7 @@ useEffect(()=>{
 
   if (!grid) return <></>
   return (
-    <div className="w-[100vw] h-[100vh] md:flex md:items-center justify-center overflow-hidden">
+    <div className="w-[100vw] h-[100vh] flex flex-col md:flex-row items-center justify-center overflow-hidden">
       <ToastContainer autoClose={3500} />
       <div className="flex md:flex-row flex-col items-center w-full md:px-[50px] md:gap-[50px] gap-[15px] p-[20px]">
         {mobileView ?

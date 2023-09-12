@@ -408,7 +408,7 @@ function App() {
             setCellSize(30 / n)
             setPopup(null)
           }}
-          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
+          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool`}
           disabled={processing || mazeCreation|| coords.selectProcess}
         >Auto-Generate
         </button>
@@ -431,7 +431,7 @@ function App() {
             setMazeCreation(true)
             setPopup(null)
           }}
-          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm`}
+          className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool`}
           disabled={processing || mazeCreation|| coords.selectProcess}
         >Draw Maze Manually
         </button>
@@ -450,25 +450,25 @@ function App() {
       <div className="flex flex-col gap-[10px] shadow-md border rounded-md p-[10px]">
         <button onClick={async () => {
           setProcessing(1)
-        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
           disabled={processing || mazeCreation|| coords.selectProcess}
           title="Traverses all possible paths"
         >Backtracking</button>
         <button onClick={async () => {
           setProcessing(2)
-        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
           disabled={processing || mazeCreation|| coords.selectProcess}
           title="Won't enter a blocked path again because of memoization"
         >Memoized Backtracking</button>
         <button onClick={async () => {
           setProcessing(3)
-        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
           disabled={processing || mazeCreation|| coords.selectProcess}
           title="Visually shows BFS with a flood-filling like effect"
         >Breadth First Search</button>
         <button onClick={async () => {
           setProcessing(4)
-        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm"
+        }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
           disabled={processing || mazeCreation|| coords.selectProcess}
           title="Using BFS, we find out the shortest path"
         >Shortest Path</button>

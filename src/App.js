@@ -101,8 +101,18 @@ function App() {
         else grid[i][j] = 0;
       }
     }
-    grid[coords.start.x][coords.start.y] = 1;
-    grid[coords.end.x][coords.end.y] = 1;
+    if (coords.start.x >= n || coords.start.y >= n || coords.end.x >= n || coords.end.y>=n) {
+      setCoords({
+        start: { x: 0, y: 0 },
+        end: { x: n - 1, y: n - 1 },
+        selectProcess: false,
+        alter: true
+      })
+    }
+    else{
+      grid[coords.start.x][coords.start.y] = 1;
+      grid[coords.end.x][coords.end.y] = 1;
+    }
     setGrid([...grid]);
   }
   const clearGrid = () => {
@@ -390,6 +400,14 @@ function App() {
         </div>
         <button
           onClick={() => {
+            if (coords.start.x >= n || coords.start.y >= n || coords.end.x >= n || coords.end.y>=n) {
+              setCoords({
+                start: { x: 0, y: 0 },
+                end: { x: n - 1, y: n - 1 },
+                selectProcess: false,
+                alter: true
+              })
+            }
             generateGrid()
             setCellSize(30 / n)
             setPopup(null)
@@ -404,6 +422,14 @@ function App() {
         </div>
         <button
           onClick={() => {
+            if (coords.start.x >= n || coords.start.y >= n || coords.end.x >= n || coords.end.y>=n) {
+              setCoords({
+                start: { x: 0, y: 0 },
+                end: { x: n - 1, y: n - 1 },
+                selectProcess: false,
+                alter: true
+              })
+            }
             clearGrid()
             setCellSize(30 / n)
             setMazeCreation(true)

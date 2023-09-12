@@ -102,12 +102,8 @@ function App() {
       }
     }
     if (coords.start.x >= n || coords.start.y >= n || coords.end.x >= n || coords.end.y>=n) {
-      setCoords({
-        start: { x: 0, y: 0 },
-        end: { x: n - 1, y: n - 1 },
-        selectProcess: false,
-        alter: true
-      })
+      grid[0][0] = 1;
+      grid[n-1][n-1] = 1;
     }
     else{
       grid[coords.start.x][coords.start.y] = 1;

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaStop } from "react-icons/fa";
+import { FaDrawPolygon, FaEraser, FaStop } from "react-icons/fa";
 import { AiFillCloseCircle, AiOutlineClear, AiOutlineControl, AiOutlineFlag } from "react-icons/ai"
 import svg from "./images/location-path.svg"
 class Queue {
@@ -52,7 +52,7 @@ function App() {
   const [speed, setSpeed] = useState(8)
   const [gridSpacing, setgridSpacing] = useState(1);
 
-  const [mazeCreation, setMazeCreation] = useState(false)
+  const [mazeCreation, setMazeCreation] = useState({isActive:false,draw:true,erase:false})
   const [cellSelection,setCellSelection]=useState(false)
 
   const [mobileView, setMobileView] = useState(false);
@@ -380,18 +380,18 @@ function App() {
   }
 
   const GridControls = () => {
-    return <div style={processing || mazeCreation|| coords.selectProcess ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
+    return <div style={processing || mazeCreation.isActive|| coords.selectProcess ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4" >
       <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
         <div>Grid Size: {n}</div>
         <input
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive|| coords.selectProcess}
           type="range" min={1} max={200} step={1} value={n} onChange={(e) => { setN(e.target.value) }} className="outline-none w-full" name="Size" id="" />
       </div>
       <div className="rounded-md shadow-md border p-[10px] flex flex-col gap-[10px]">
         <div className={`rounded-md border px-[10px] text-xs md:text-sm py-[5px] w-full`}>
           <div>Grid Spacing: {gridSpacing}</div>
           <input
-            disabled={processing || mazeCreation|| coords.selectProcess}
+            disabled={processing || mazeCreation.isActive|| coords.selectProcess}
             type="range" min={1} max={10} step={1} value={gridSpacing} onChange={(e) => { setgridSpacing(e.target.value) }} className="outline-none w-full" name="Density" id="" />
         </div>
         <button
@@ -409,7 +409,7 @@ function App() {
             setPopup(null)
           }}
           className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool`}
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
         >Auto-Generate
         </button>
 
@@ -428,11 +428,11 @@ function App() {
             }
             clearGrid()
             setCellSize(30 / n)
-            setMazeCreation(true)
+            setMazeCreation({isActive:true,draw:true,erase:false})
             setPopup(null)
           }}
           className={`rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool`}
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
         >Draw Maze Manually
         </button>
       </div>
@@ -440,36 +440,36 @@ function App() {
   }
 
   const AlgoAndSpeedControls = () => {
-    return <div style={processing || mazeCreation|| coords.selectProcess ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
+    return <div style={processing || mazeCreation.isActive || coords.selectProcess ? { opacity: 0.2 } : { opacity: 1 }} className="flex flex-col gap-[5px] md:gap-[10px] transition flex-grow min-w-[80%] md:min-w-fit md:max-w-1/4">
       <div className={`rounded-md shadow-md border px-[10px] text-xs md:text-sm py-[5px]`}>
         <div>Speed: {speed}</div>
         <input
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
           type="range" min={1} max={10} step={1} value={speed} onChange={(e) => { setSpeed(e.target.value) }} className="outline-none w-full" name="Size" id="" />
       </div>
       <div className="flex flex-col gap-[10px] shadow-md border rounded-md p-[10px]">
         <button onClick={async () => {
           setProcessing(1)
         }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
           title="Traverses all possible paths"
         >Backtracking</button>
         <button onClick={async () => {
           setProcessing(2)
         }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
           title="Won't enter a blocked path again because of memoization"
         >Memoized Backtracking</button>
         <button onClick={async () => {
           setProcessing(3)
         }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
           title="Visually shows BFS with a flood-filling like effect"
         >Breadth First Search</button>
         <button onClick={async () => {
           setProcessing(4)
         }} className="rounded-md border px-[10px] py-[5px] text-xs md:text-sm cool"
-          disabled={processing || mazeCreation|| coords.selectProcess}
+          disabled={processing || mazeCreation.isActive || coords.selectProcess}
           title="Using BFS, we find out the shortest path"
         >Shortest Path</button>
       </div>
@@ -518,10 +518,32 @@ useEffect(()=>{
           : GridControls()}
         <div className="min-w-fit transition">
           <div className="flex items-center gap-[5px]">
-            <button onClick={()=>{clearPath();setCoords(coords=>{return {...coords,selectProcess:true}}); toast.info("You can now change start & end points")}} disabled={(processing || mazeCreation|| coords.selectProcess)} style={(processing || mazeCreation|| coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} className="text-2xl" title="Change Start and End Points"><AiOutlineFlag/></button>
-            <button style={!(processing || mazeCreation || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; setMazeCreation(false);setCoords(coords=>{return {...coords,selectProcess:false}}) }} className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
-            {mazeCreation && <button
-              style={!(mazeCreation) ? { opacity: 0 } : { opacity: 1 }}
+            <button onClick={()=>{clearPath();setCoords(coords=>{return {...coords,selectProcess:true}}); toast.info("You can now change start & end points")}} disabled={(processing || mazeCreation.isActive || coords.selectProcess)} style={(processing || mazeCreation.isActive || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} className="text-2xl" title="Change Start and End Points"><AiOutlineFlag/></button>
+            <button style={!(processing || mazeCreation.isActive || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; setMazeCreation({isActive:false,draw:true,erase:false});setCoords(coords=>{return {...coords,selectProcess:false}}) }} className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
+            {mazeCreation.isActive && 
+            <>
+            <button
+             style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
+             className={`flex items-center mx-auto gap-[5px] text-sm justify-center ${mazeCreation.draw&&"text-green-500"} hover:text-green-500 transition`}
+             onClick={()=>{
+              setMazeCreation({isActive:true,draw:true,erase:false})
+             }}
+            >
+              <FaDrawPolygon/>
+              Draw
+              </button>
+            <button
+            style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
+            className={`flex items-center mx-auto gap-[5px] text-sm justify-center ${mazeCreation.erase&&"text-blue-500"} hover:text-blue-500 transition`}
+            onClick={()=>{
+              setMazeCreation({isActive:true,draw:false,erase:true})
+             }}
+            >
+              <FaEraser/>
+              Erase
+              </button>
+            <button
+              style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
               className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"
               onClick={() => {
                 clearGrid()
@@ -529,7 +551,9 @@ useEffect(()=>{
             >
               <AiOutlineClear />
               Clear Grid
-            </button>}
+            </button>
+            </>
+            }
           </div>
           <div id="grid" className="rounded-lg p-[15px] shadow-lg transition">
             {
@@ -562,18 +586,24 @@ useEffect(()=>{
                         }
                       }}
                       onMouseEnter={() => {
-                        if (mazeCreation&&(cellSelection||mobileView)) {
+                        if (mazeCreation.isActive && (cellSelection||mobileView)) {
                           let oldGrid = grid;
+                          if(mazeCreation.draw)
                           oldGrid[idx][i] = 0;
+                          if(mazeCreation.erase)
+                          oldGrid[idx][i] = 1;
                           if(idx === coords.start.x && i === coords.start.y) oldGrid[idx][i] = 1;
                           if(idx === coords.end.x && i === coords.end.y) oldGrid[idx][i] = 1;
                           setGrid([...oldGrid])
                         }
                       }}
                       onTouchStart={() => {
-                        if (mazeCreation&&(cellSelection||mobileView)) {
+                        if (mazeCreation.isActive && (cellSelection||mobileView)) {
                           let oldGrid = grid;
+                          if(mazeCreation.draw)
                           oldGrid[idx][i] = 0;
+                          if(mazeCreation.erase)
+                          oldGrid[idx][i] = 1;
                           if(idx === coords.start.x && i === coords.start.y) oldGrid[idx][i] = 1;
                           if(idx === coords.end.x && i === coords.end.y) oldGrid[idx][i] = 1;
                           setGrid([...oldGrid])
@@ -589,7 +619,7 @@ useEffect(()=>{
                                 cell === 2 ? "bg-black" :
                                   cell === 3 && "bg-green-300"
                         }
-                        ${(mazeCreation||coords.selectProcess) && "hover:border border-black"}
+                        ${(mazeCreation.isActive || coords.selectProcess) && "hover:border border-black"}
                      overflow-visible
                      `}
                     >

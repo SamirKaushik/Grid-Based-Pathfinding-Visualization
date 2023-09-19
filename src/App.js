@@ -524,7 +524,7 @@ useEffect(()=>{
             <>
             <button
              style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
-             className={`flex items-center mx-auto gap-[5px] text-sm justify-center ${mazeCreation.draw&&"text-green-500"} hover:text-green-500 transition`}
+             className={`flex items-center mx-auto gap-[5px] text-xs sm:text-sm justify-center ${mazeCreation.draw&&"text-green-500"} hover:text-green-500 transition`}
              onClick={()=>{
               setMazeCreation({isActive:true,draw:true,erase:false})
              }}
@@ -534,7 +534,7 @@ useEffect(()=>{
               </button>
             <button
             style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
-            className={`flex items-center mx-auto gap-[5px] text-sm justify-center ${mazeCreation.erase&&"text-blue-500"} hover:text-blue-500 transition`}
+            className={`flex items-center mx-auto gap-[5px] text-xs sm:text-sm justify-center ${mazeCreation.erase&&"text-blue-500"} hover:text-blue-500 transition`}
             onClick={()=>{
               setMazeCreation({isActive:true,draw:false,erase:true})
              }}
@@ -544,7 +544,7 @@ useEffect(()=>{
               </button>
             <button
               style={!(mazeCreation.isActive) ? { opacity: 0 } : { opacity: 1 }}
-              className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"
+              className="flex items-center mx-auto gap-[5px] text-xs sm:text-sm justify-center hover:text-red-500 transition"
               onClick={() => {
                 clearGrid()
               }}

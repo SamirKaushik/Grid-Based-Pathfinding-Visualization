@@ -519,7 +519,7 @@ useEffect(()=>{
         <div className="min-w-fit transition">
           <div className="flex items-center gap-[5px]">
             <button onClick={()=>{clearPath();setCoords(coords=>{return {...coords,selectProcess:true}}); toast.info("You can now change start & end points")}} disabled={(processing || mazeCreation.isActive || coords.selectProcess)} style={(processing || mazeCreation.isActive || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} className="text-2xl" title="Change Start and End Points"><AiOutlineFlag/></button>
-            <button style={!(processing || mazeCreation.isActive || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; setMazeCreation({isActive:false,draw:true,erase:false});setCoords(coords=>{return {...coords,selectProcess:false}}) }} className="flex items-center mx-auto gap-[5px] text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
+            <button style={!(processing || mazeCreation.isActive || coords.selectProcess) ? { opacity: 0 } : { opacity: 1 }} onClick={() => { cancelToken.current = true; setMazeCreation({isActive:false,draw:true,erase:false});setCoords(coords=>{return {...coords,selectProcess:false}}) }} className="flex items-center mx-auto gap-[5px] text-xs sm:text-sm justify-center hover:text-red-500 transition"><FaStop /> Stop</button>
             {mazeCreation.isActive && 
             <>
             <button
